@@ -32,13 +32,13 @@ paths = natsorted(glob.glob(sys.argv[1]))
 
 #####################################################################
 # conditions:
-cprot = paths[0].split('cprot-')[1].split('_')[0]       # get protein concentration
-cprot = convert_1dx_xxx(cprot)                          # change format
 seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
-csalt = paths[0].split('csalt-')[1].split('_')[0]       # read csalt
+cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
+cprot = convert_1dx_xxx(cprot)                          # change format
+csalt = paths[0].split('csalt-')[1].split('_')[0]       # read salt concentration
 confs = paths[0].split('confs-')[1].split('_')[0]       # read confs
 rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
-symetry = path[0].split('symetry-')[1].split('_')[0]   # read symetry
+symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
 dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
 #############################

@@ -13,15 +13,18 @@ import sys
 # how to run the script:
 '''
 
-python3 plot_gamma-cprot_peps.py {path1} {path2} {path3} {pHs}
+python3 plot_gamma-cprot_peps.py {path1} {path2} {path3} {pH} {unit}
 
+{path} = 'Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+{pH} = '4 5 7'
+{unit} = 'mg'
 '''
 
 #####################################################################
 # import my_funtions.py:
-current_directory = os.getcwd()                         # current directory path:
-previous_directory = os.path.dirname(current_directory) # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') 
+current_directory = os.getcwd()                          # current directory path:
+previous_directory = os.path.dirname(current_directory)  # previous directory path:
+sys.path.append(f'{previous_directory}/my_functions.py') # import my functions
 from my_functions import *
 
 #####################################################################
@@ -32,15 +35,18 @@ paths3 = sorted(glob.glob(sys.argv[3]))
 paths_peps = [paths1, paths2, paths3]
 
 pH = float(sys.argv[4])
+unit = sys.argv[5]
 
 #####################################################################
 # conditions:
-cprot = paths_peps[0][0].split('cprot-')[1].split('_')[0]
-csalt = paths_peps[0][0].split('csalt-')[1].split('_')[0]
-confs = paths_peps[0][0].split('confs-')[1].split('_')[0]
-rsize = paths_peps[0][0].split('rsize-')[1].split('_')[0]
-symetry = path[0].split('symetry-')[1].split('_')[0]
-dz = paths_peps[0][0].split('dz-')[1].split('_')[0]
+seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
+cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
+cprot = convert_1dx_xxx(cprot)                          # change format
+csalt = paths[0].split('csalt-')[1].split('_')[0]       # read salt concentration
+confs = paths[0].split('confs-')[1].split('_')[0]       # read confs
+rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
+symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
+dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
 #####################################################################
 # plots:
@@ -61,33 +67,57 @@ for paths in paths_peps:
 
         # get gamma:
         df_to_pH = df[df['pH'] == pH]
-        gamma_list.append(df_to_pH['gamma'].values[0])
+        gamma = df_to_pH['gamma'].values[0]
+        
+        # get sequence:
+        seq = re.search(r'_seq\d+-(\w+)_', path).group(1)
+                
+        # get molecular weight:
+        mw = mw_from_sequence(seq)
+        
+        # choose units:
+        if unit == 'mg':
+            # covert gamma unit from molecules/nm2 to mg/m2:
+            gamma = gamma_molec_to_mg_m2(gamma, mw)
+            
+            # append gamma into gamma list:
+            gamma_list.append(gamma)
+            
+        else:
+            # left gamma unit in molecules/nm2:
+            continue
 
         # get cprot:
         cprot = path.split('cprot-')[1].split('_')[0]
         cprot = convert_1dx_xxx(cprot)
         cprot = float(cprot)
-        cprot_list.append(cprot)
-
-        seq = re.search(r'_seq\d+-(\w+)_', path).group(1)
-
-    # convert to M to mM:
-    cprot_list = [x * 1000 for x in cprot_list]
-
-    # get molecular weight:
-    mw = mw_from_sequence(seq)
-
-    # change y_scale from molecules/nm2 to mg/m2:
-    gamma_list = [gamma_molec_to_mg_m2(x, mw) for x in gamma_list]
+        
+        # choose units:
+        if unit == 'mg':
+            # covert cprot unit from M to mg/ml:
+            cprot = cprot*mw
+            
+            # append coprot into cprot list:     
+            cprot_list.append(cprot)
+            
+        else:
+            # left cprot unit in M:
+            continue
 
     # get plot:
     ax.plot(cprot_list, gamma_list, marker='o', label= f'{seq}')
 
 #####################################################################
 # format:
+# choose units:
+if unit == 'mg':
+    ax.set_xlabel("cprot (mg/ml)", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
+else:
+    ax.set_xlabel("cprot (M)", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12)
+ 
 ax.set_box_aspect(1)
-ax.set_xlabel("cprot (M)", fontsize=12)
-ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
 add_text(ax, f'pH = {pH}\n[NaCl] = {csalt} M', location='custom', offset=(0.1, 0.2), fontsize=12)
 ax.legend(prop={'size':12, 'family': 'monospace'},
           loc='center',

@@ -15,7 +15,8 @@ from natsort import natsorted
 # how to run the script:
 '''
 
-python3 plot_gamma-pH-confs.py {path1} {pHs}
+python3 plot_gamma-pH-confs.py {path1} {pHs} {unit}
+{unit} = 'mg'
 
 '''
 
@@ -30,15 +31,17 @@ from my_functions import *
 # inputs:
 paths = natsorted(glob.glob(sys.argv[1]))
 pHs = list(sys.argv[2].split(' '))
+units = sys,.argv[3]
 
 #####################################################################
 # conditions:
-cprot = paths[0].split('cprot-')[1].split('_')[0]       # get protein concentration
-cprot = convert_1dx_xxx(cprot)                          # change format
 seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
-csalt = paths[0].split('csalt-')[1].split('_')[0]       # get salt concentration
+cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
+cprot = convert_1dx_xxx(cprot)                          # change format
+csalt = paths[0].split('csalt-')[1].split('_')[0]       # read salt concentration
+confs = paths[0].split('confs-')[1].split('_')[0]       # read confs
 rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
-symetry = path[0].split('symetry-')[1].split('_')[0]   # read symetry
+symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
 dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
 #####################################################################
@@ -54,8 +57,14 @@ for path in paths:
     # get molecular weight from peptide sequence:
     mw = mw_from_sequence(seq)
     
-    # convert from molecules/nm2 to mg/m2:
-    gamma_list = [gamma_molec_to_mg_m2(x, mw) for x in df['gamma']]
+    # choose units:
+    if unit == 'mg':
+        # covert gamma unit from molecules/nm2 to mg/m2:
+        gamma_list = [gamma_molec_to_mg_m2(x, mw) for x in df['gamma']]
+            
+    else:
+        # left gamma unit in molecules/nm2:
+        continue
     
     # get confs:
     confs = path.split('confs-')[1].split('_')[0] 
@@ -65,6 +74,12 @@ for path in paths:
 
 #####################################################################
 # format:
+# choose units:
+if unit == 'mg':
+    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
+else:
+    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12)
+
 ax.set_box_aspect(1)
 ax.set_xlabel("pH", fontsize=12)
 ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)

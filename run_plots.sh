@@ -5,7 +5,7 @@
 # one peptide as an example:
 path='Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
 pH='4 5 7'
-./../plot_gamma-cprot.py "$path" "$pH"
+./../plot_gamma-cprot.py "$path" "$pH" "mg"
 
 
 # plot gamma vs cprot at one pH for multiples peptides:
@@ -13,8 +13,8 @@ path1='Puddu2012_seq1-KLPGWSG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma
 path2='Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
 path3='Puddu2012_seq3-LDHSLHS_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
 pH='7'
-./../plot_gamma-pH_peps.py "$path1" "$path2" "$path3"
-./../plot_gamma-cprot_peps.py "$path1" "$path2" "$path3" "$pH"
+./../plot_gamma-pH_peps.py "$path1" "$path2" "$path3" "mg"
+./../plot_gamma-cprot_peps.py "$path1" "$path2" "$path3" "$pH" "mg"
 
 
 #END
@@ -22,7 +22,7 @@ pH='7'
 path1='Puddu2012_seq1-KLPGWSG_cprot-1d6_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
 path2='Puddu2012_seq1-KLPGWSG_cprot-1d6_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
 path3='Puddu2012_seq1-KLPGWSG_cprot-1d6_csalt-0.001_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
-./../plot_gamma-csalt.py "$path1" "$path2" "$path3"
+./../plot_gamma-csalt.py "$path1" "$path2" "$path3" "mg"
 
 
 # plot gamma vs rsize:
