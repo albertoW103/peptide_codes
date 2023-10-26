@@ -46,7 +46,7 @@ for sequence in sequences:
 
     # save the string into a file:
     label += 1
-    with open('{}.txt'.format('familypep-' + str(label)), 'w') as file:
+    with open(f'familypep-{str(label)}.txt', 'w') as file:
         file.write(peptides_string)
 
 exit()

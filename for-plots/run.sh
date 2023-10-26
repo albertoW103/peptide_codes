@@ -11,20 +11,20 @@
 csalt_list='0.1 0.01 0.001' # in M
 confs_list='2500'
 #cprot_list='1d7 1d6 1d5 1d4'   # 1d6 mean 1d-6 in the param.in file
-cprot_list='1d3 1d2 1d1 1d0'   # 1d6 mean 1d-6 in the param.in file
+cprot_list='1d3 1d2 1d1 1d0'    # 1d6 mean 1d-6 in the param.in file
 dist='0.4'
 np='6'
 ebs='yes'
 guessx='no'  # use guessx.in
 path='../../../../codes_gabi/mt_1d/code/mt1d.x' # on cordoba
-#path='../../../mt_1d/code/mt1d.x'               # on indiana and zacate
+#path='../../../mt_1d/code/mt1d.x'              # on indiana and zacate
 dz_list='0.50'
 symetries='planar sphere'
 rplannar='1'
-rsize_list='1 10 20 30 40 50 100 500 1000' # in nm, 1: plane; > 1 sphere
+rsize_list='1 10 20 30 40 50 100 500 1000'   # in nm, 1: plane; > 1 sphere
 file_list=$(ls -1v inputs/*.txt)             # select all paperpep-*.txt
-
-
+group_position='0.1'                         # define the position of the silanol group, it must fall on the first layer!!!
+nlayes='100'                                 # n amount of layes
 
 
 
@@ -114,19 +114,23 @@ if [ $guessx = 'yes' ]; then            # for planar we use 1
                         # on param.in:
                         sed -i "s/POS5/planar/g" param.in
                         sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                        rmax=$(echo "$rsize + 100" | bc)       #
+                        rmax=$(echo "$rsize + $nlayes" | bc)       #
                         sed -i "s/POS8/$rmax/g" param.in       #
+                        
                         # on surface.mol:
-                        surface=$(echo "$rsize + 0.1" | bc)
+                        surface=$(echo "$rsize + $group_position" | bc)
                         sed -i "s/POS1/$surface/g" surface.mol
+                        
                     elif [ $symetry = 'sphere' ]; then
                         sed -i "s/POS5/sphere/g" param.in
                         sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                        rmax=$(echo "$rsize + 100" | bc)
+                        rmax=$(echo "$rsize + $nlayes" | bc)
                         sed -i "s/POS8/$rmax/g" param.in       #
+                        
                         # on surface.mol:
-                        surface=$(echo "$rsize + 0.1" | bc)
+                        surface=$(echo "$rsize + $group_position" | bc)
                         sed -i "s/POS1/$surface/g" surface.mol
+                        
                     else
                         continue
                     fi
@@ -202,19 +206,23 @@ for family_seq in $basename_list; do                     # for every main file t
                                     # on param.in:
                                     sed -i "s/POS5/planar/g" param.in
                                     sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + 100" | bc)       #
+                                    rmax=$(echo "$rsize + $nlayes" | bc)       #
                                     sed -i "s/POS8/$rmax/g" param.in       #
+                                    
                                     # on surface.mol:
-                                    surface=$(echo "$rsize + 0.1" | bc)
+                                    surface=$(echo "$rsize + $group_position" | bc)
                                     sed -i "s/POS1/$surface/g" surface.mol
+                                    
                                 elif [ $symetry = 'sphere' ]; then
                                     sed -i "s/POS5/sphere/g" param.in
                                     sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + 100" | bc)
+                                    rmax=$(echo "$rsize + $nlayes" | bc)
                                     sed -i "s/POS8/$rmax/g" param.in       #
+                                    
                                     # on surface.mol:
-                                    surface=$(echo "$rsize + 0.1" | bc)
+                                    surface=$(echo "$rsize + $group_position" | bc)
                                     sed -i "s/POS1/$surface/g" surface.mol
+                                    
                                 else
                                     continue
                                 fi

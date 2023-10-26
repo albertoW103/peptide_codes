@@ -86,7 +86,7 @@ for pH in pHs:
         confs_list.append(confs)
 
     # get plot:
-    ax.plot(confs_list, gamma_list, marker='o', label=f'pH = {pH}')
+    ax.plot(confs_list, gamma_list, marker='o', label=f'pH = {pH}', colors=my_colors[0])
 
 #####################################################################
 # format:

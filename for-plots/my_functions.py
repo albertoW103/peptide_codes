@@ -19,6 +19,12 @@ import matplotlib.font_manager as fm
 # from my_functions import *
 #####################################################################
 
+
+my_colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'magenta', 'lime', 'teal', 'navy', 'maroon', 'aqua', 'silver', 'gold', 'indigo', 'coral', 'orchid', 'salmon', 'seagreen', 'sienna', 'tan', 'tomato', 'turquoise', 'violet', 'wheat', 'yellow']
+
+
+
+
 def style_ticks_plot(ax, x_mayor_tick):
     '''
     Description of this function:

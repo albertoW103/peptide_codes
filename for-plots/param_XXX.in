@@ -1,0 +1,66 @@
+
+
+**********************************
+**********************************
+Environment **********************
+
+14.0 1.0 			pHmin, pHmax
+6   				ndpH
+0.25 0.2 0.1 0.05 0.02 0.01	pHstp (1:ndpH)	
+		
+POS1				csalt
+
+300.0				Temperature
+
+Q 0.0
+
+
+
+
+**********************************
+**********************************
+Adsorbate ************************
+
+POS2				number of adsorbates (can be = 0)
+
+peptide
+POS3
+
+
+
+**********************************
+**********************************
+Resolution ***********************
+
+POS4				guessx=0,2,3
+
+POS5				planar/cylinder/sphere
+
+POS6		 	       	delta (nm) shell...
+POS7 POS8				dimensions (nm) Rsurf to Rmax
+
+dimkrlv 200
+fnormtol 1.0d-6
+
+
+
+**********************************
+**********************************
+Constants ************************
+
+50				# of rotations adsorbate
+50				# of rotations surface
+
+14.0				pKw
+
+78.5				eps_sol
+
+
+**********************************
+**********************************
+Surface ***************************
+
+1				number of species on the surface (can be = 0)
+
+silica
+4.7 t				! grafting density, t=sigma,f=single molecule
