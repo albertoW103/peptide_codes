@@ -8,23 +8,28 @@
 ####################################
 # inputs:
 
-csalt_list='0.1 0.01 0.001' # in M
-confs_list='2500'
+csalt_list='0.1' # in M
+confs_list='1'
 #cprot_list='1d7 1d6 1d5 1d4'   # 1d6 mean 1d-6 in the param.in file
-cprot_list='1d3 1d2 1d1 1d0'    # 1d6 mean 1d-6 in the param.in file
+cprot_list='1d3 1d2 1d1 1d0'   # 1d6 mean 1d-6 in the param.in file
 dist='0.4'
-np='6'
-ebs='yes'
-guessx='no'  # use guessx.in
+np='8'
+ebs='no'
+guessx='yes'  # use guessx.in
+#path='~/wilson/Research/codes_gabi/mt_1d/code/mt1d.x' # on cordoba
 path='../../../../codes_gabi/mt_1d/code/mt1d.x' # on cordoba
-#path='../../../mt_1d/code/mt1d.x'              # on indiana and zacate
+#path='../../../mt_1d/code/mt1d.x'               # on indiana and zacate
 dz_list='0.50'
-symetries='planar sphere'
-rplannar='1'
-rsize_list='1 10 20 30 40 50 100 500 1000'   # in nm, 1: plane; > 1 sphere
-file_list=$(ls -1v inputs/*.txt)             # select all paperpep-*.txt
+#symetries='planar sphere'
+symetries='planar'
+rplanar='1'
+#rsize_list='1 10 20 30 40 50 100 500 1000' # in nm, 1: plane; > 1 sphere
+#rsize_list='1 10 20 30 40 50 100 500 1000' # in nm, 1: plane; > 1 sphere
 group_position='0.1'                         # define the position of the silanol group, it must fall on the first layer!!!
 nlayes='100'                                 # n amount of layes
+file_list=$(ls -1v inputs/*.txt)             # select all paperpep-*.txt
+
+
 
 
 
@@ -73,15 +78,15 @@ declare -A aa_mapping=(
 if [ $guessx = 'yes' ]; then            # for planar we use 1
     for csalt in $csalt_list; do
         for symetry in $symetries; do
-            if [ $symetry = 'plannar' ]; then
+            if [ $symetry = 'planar' ]; then
                 rsize_list_new=$rplanar
-            elif [$symetry = 'sphere' ]; then
+            elif [ $symetry = 'sphere' ]; then
                 rsize_list_new=$rsize_list
             else
                continue
             fi
-                for rsize in $rsize_list_new; do
-                    for dz in $dz_list; do
+            for rsize in $rsize_list_new; do
+                for dz in $dz_list; do
                     # create directory and copy files:
 	            mkdir no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/
 	            cd no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/
@@ -110,21 +115,21 @@ if [ $guessx = 'yes' ]; then            # for planar we use 1
 	            sed -i "s/POS6/$dz/g" param.in       # sed dz, usually 100
 
                     # plane and surface:
-                    if [ $symetry = 'plannar' ]; then            # for planar we use 1
+                    if [ $symetry = 'planar' ]; then            # for planar we use 1
                         # on param.in:
                         sed -i "s/POS5/planar/g" param.in
                         sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                        rmax=$(echo "$rsize + $nlayes" | bc)       #
+                        rmax=$(echo "$rsize + $nlayes" | bc)   #
                         sed -i "s/POS8/$rmax/g" param.in       #
-                        
                         # on surface.mol:
                         surface=$(echo "$rsize + $group_position" | bc)
                         sed -i "s/POS1/$surface/g" surface.mol
                         
                     elif [ $symetry = 'sphere' ]; then
+                        # on param.in:
                         sed -i "s/POS5/sphere/g" param.in
                         sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                        rmax=$(echo "$rsize + $nlayes" | bc)
+                        rmax=$(echo "$rsize + $nlayes" | bc)   #
                         sed -i "s/POS8/$rmax/g" param.in       #
                         
                         # on surface.mol:
@@ -142,6 +147,7 @@ if [ $guessx = 'yes' ]; then            # for planar we use 1
 
 	            # go back:
                     cd ../
+                    
                 done
             done
         done
@@ -153,24 +159,25 @@ else
     echo 'simulations without protein are not run'
 fi
 
-
+#exit
 for family_seq in $basename_list; do                     # for every main file that contains many differenet SBP sequences
     peptide_list=$(more inputs/$family_seq.txt)          # create a list with peptide sequences
     for cprot in $cprot_list; do                         # for every protein concentration
         for csalt in $csalt_list; do                     # for every salt concentration
-            for symetry in $symetries: do
-                if [ symetry = 'plannar' ]; then
-                    rsize_list_new=$rplannar
-                elif [ symetry = 'sphere' ]: then
+            for symetry in $symetries; do
+                if [ $symetry = 'planar' ]; then
+                    rsize_list_new=$rplanar
+                elif [ $symetry = 'sphere' ]; then
                     rsize_list_new=$rsize_list
                 else
-                   continue
+                    continue
                 fi
                 for rsize in $rsize_list_new; do
                     for dz in $dz_list; do
                         for confs in $confs_list; do             # for every conformation
-                            label=01                              # create a label
+                            label=1                              # create a label
                             for sequence in $peptide_list; do    # for every peptide sequence
+                                label=$(printf "%02d" $label)
 	                        # create directory and copy files:
 	                        mkdir ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/    # build a directory
                                 cd ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/       # go to the directory
@@ -202,11 +209,12 @@ for family_seq in $basename_list; do                     # for every main file t
                                 mv surface_XXX.mol surface.mol      #
 
                                 # plane and surface:
-                                if [ $symetry = 'plannar' ]; then
+                                if [ $symetry = 'planar' ]; then
+                                
                                     # on param.in:
                                     sed -i "s/POS5/planar/g" param.in
                                     sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + $nlayes" | bc)       #
+                                    rmax=$(echo "$rsize + $nlayes" | bc)   #
                                     sed -i "s/POS8/$rmax/g" param.in       #
                                     
                                     # on surface.mol:
@@ -214,9 +222,11 @@ for family_seq in $basename_list; do                     # for every main file t
                                     sed -i "s/POS1/$surface/g" surface.mol
                                     
                                 elif [ $symetry = 'sphere' ]; then
+                                
+                                    # on param.in:
                                     sed -i "s/POS5/sphere/g" param.in
                                     sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + $nlayes" | bc)
+                                    rmax=$(echo "$rsize + $nlayes" | bc)   #
                                     sed -i "s/POS8/$rmax/g" param.in       #
                                     
                                     # on surface.mol:
@@ -288,8 +298,9 @@ for family_seq in $basename_list; do                     # for every main file t
 
                                cd ../
                                # Increment label
+                               label=$((10#$label))
                                label=$((label + 1))
-                               label=$(printf "%02d" $label)
+                               #label=$(printf "%02d" $label)
                             done
                         done
                     done
