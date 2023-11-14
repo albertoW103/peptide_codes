@@ -13,13 +13,14 @@ confs_list='1'
 #cprot_list='1d7 1d6 1d5 1d4'   # 1d6 mean 1d-6 in the param.in file
 cprot_list='1d3 1d2 1d1 1d0'   # 1d6 mean 1d-6 in the param.in file
 dist='0.4'
-np='8'
+np='2'
 ebs='no'
 guessx='yes'  # use guessx.in
-path='/home/wilson/Research/codes_gabi/mt_1d/code/mt1d.x' # on cordoba
+path='/home/wilson/Research/codes_gabi/test_mt_1d/code/mt1d.x' # on cordoba
 #path='../../../../codes_gabi/mt_1d/code/mt1d.x' # on cordoba
 #path='../../../mt_1d/code/mt1d.x'               # on indiana and zacate
 dz_list='0.50'
+rots_list='50 100 200 500' 
 #symetries='planar sphere'
 symetries='planar'
 rplanar='1'
@@ -174,133 +175,137 @@ for family_seq in $basename_list; do                     # for every main file t
                 fi
                 for rsize in $rsize_list_new; do
                     for dz in $dz_list; do
-                        for confs in $confs_list; do             # for every conformation
-                            label=1                              # create a label
-                            for sequence in $peptide_list; do    # for every peptide sequence
-                                label=$(printf "%02d" $label)
-	                        # create directory and copy files:
-	                        mkdir ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/    # build a directory
-                                cd ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/       # go to the directory
+                        for rots in $rots_list; do
+                            for confs in $confs_list; do             # for every conformation
+                                label=1                              # create a label
+                                for sequence in $peptide_list; do    # for every peptide sequence
+                                    label=$(printf "%02d" $label)
+	                            # create directory and copy files:
+	                            mkdir ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_rots-${rots}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/    # build a directory
+                                    cd ${family_seq}_seq${label}-${sequence}_cprot-${cprot}_csalt-${csalt}_confs-${confs}_rots-${rots}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/       # go to the directory
 
-	                        # copy files from inputs:
-                                cp ../inputs/adsorbate_XXX.mol .     # copy file
-                                cp ../inputs/surface_XXX.mol .       # copy file
+	                            # copy files from inputs:
+                                    cp ../inputs/adsorbate_XXX.mol .     # copy file
+                                    cp ../inputs/surface_XXX.mol .       # copy file
 
-                                # copy ebs file:
-                                if [ $ebs = 'yes' ];then
-                                    cp ../inputs/CG_model-ebs_XXX.mol .     # copy file
-                                    mv CG_model-ebs_XXX.mol CG_model.mol    # change name
-                                else
-                                    cp ../inputs/CG_model_XXX.mol .         # copy file
-                                    mv CG_model_XXX.mol CG_model.mol        # change name
-                                fi
+                                    # copy ebs file:
+                                    if [ $ebs = 'yes' ];then
+                                        cp ../inputs/CG_model-ebs_XXX.mol .     # copy file
+                                        mv CG_model-ebs_XXX.mol CG_model.mol    # change name
+                                    else
+                                        cp ../inputs/CG_model_XXX.mol .         # copy file
+                                        mv CG_model_XXX.mol CG_model.mol        # change name
+                                    fi
 
-                                cp ../inputs/*.sh .              # copy file
-                                cp ../inputs/*.in .              # copy file
+                                    cp ../inputs/*.sh .              # copy file
+                                    cp ../inputs/*.in .              # copy file
 
-                                # get the basename of the xs file at the highest pH:
-                                highest_pH_xs_file=$(ls ../no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/xs* | awk -F'pH' '{print $2, $0}' | sort -n | tail -n 1 | awk '{print $2}' | xargs -I {} basename {})
-                                cp ../no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/$highest_pH_xs_file .   # copy xs file
+                                    # get the basename of the xs file at the highest pH:
+                                    highest_pH_xs_file=$(ls ../no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/xs* | awk -F'pH' '{print $2, $0}' | sort -n | tail -n 1 | awk '{print $2}' | xargs -I {} basename {})
+                                    cp ../no-protein_csalt-${csalt}_symetry-${symetry}_rsize-${rsize}_dz-${dz}/$highest_pH_xs_file .   # copy xs file
 
-		                # change name of files:
-		                mv $highest_pH_xs_file guessx.in    # create a guessx.in file
-                                mv adsorbate_XXX.mol adsorbate.mol  # change name
-                                mv param_XXX.in param.in            # change name
-                                mv surface_XXX.mol surface.mol      #
+		                    # change name of files:
+		                    mv $highest_pH_xs_file guessx.in    # create a guessx.in file
+                                    mv adsorbate_XXX.mol adsorbate.mol  # change name
+                                    mv param_XXX.in param.in            # change name
+                                    mv surface_XXX.mol surface.mol      #
 
-                                # plane and surface:
-                                if [ $symetry = 'planar' ]; then
+                                    # plane and surface:
+                                    if [ $symetry = 'planar' ]; then
                                 
-                                    # on param.in:
-                                    sed -i "s/POS5/planar/g" param.in
-                                    sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + $nlayes" | bc)   #
-                                    sed -i "s/POS8/$rmax/g" param.in       #
+                                        # on param.in:
+                                        sed -i "s/POS5/planar/g" param.in
+                                        sed -i "s/POS7/$rsize/g" param.in
+                                        rmax=$(echo "$rsize + $nlayes" | bc)
+                                        sed -i "s/POS8/$rmax/g" param.in
+                                        sed -i "s/POS9/$rots/g" param.in
+                                                                        
+                                        # on surface.mol:
+                                        surface=$(echo "$rsize + $group_position" | bc)
+                                        sed -i "s/POS1/$surface/g" surface.mol
                                     
-                                    # on surface.mol:
-                                    surface=$(echo "$rsize + $group_position" | bc)
-                                    sed -i "s/POS1/$surface/g" surface.mol
-                                    
-                                elif [ $symetry = 'sphere' ]; then
+                                    elif [ $symetry = 'sphere' ]; then
                                 
-                                    # on param.in:
-                                    sed -i "s/POS5/sphere/g" param.in
-                                    sed -i "s/POS7/$rsize/g" param.in      # seed r size
-                                    rmax=$(echo "$rsize + $nlayes" | bc)   #
-                                    sed -i "s/POS8/$rmax/g" param.in       #
+                                        # on param.in:
+                                        sed -i "s/POS5/sphere/g" param.in
+                                        sed -i "s/POS7/$rsize/g" param.in
+                                        rmax=$(echo "$rsize + $nlayes" | bc)
+                                        sed -i "s/POS8/$rmax/g" param.in
+                                        sed -i "s/POS9/$rots/g" param.in
+                                                                            
+                                        # on surface.mol:
+                                        surface=$(echo "$rsize + $group_position" | bc)
+                                        sed -i "s/POS1/$surface/g" surface.mol
                                     
-                                    # on surface.mol:
-                                    surface=$(echo "$rsize + $group_position" | bc)
-                                    sed -i "s/POS1/$surface/g" surface.mol
-                                    
-                                else
-                                    continue
-                                fi
+                                    else
+                                        continue
+                                    fi
 
-                                # Convert the peptide sequence to the desired formate
-                                #####################################
-	                        # split the peptide sequence into three parts
-	                        first_aa=${sequence:0:1}     # first aminoacid, on-letter code
-	                        middle_seq=${sequence:1:-1}  # middle aminoacid seq, one code
-	                        last_aa=${sequence: -1}      # last aminoacid , one-letter code
+                                    # Convert the peptide sequence to the desired formate:
+                                    #####################################
+	                            # split the peptide sequence into three parts:
+	                            first_aa=${sequence:0:1}     # first aminoacid, on-letter code
+	                            middle_seq=${sequence:1:-1}  # middle aminoacid seq, one code
+	                            last_aa=${sequence: -1}      # last aminoacid , one-letter code
 
-	                        # add space to the middle_aa sequence
-                                middle_seq=$(echo "$middle_seq" | sed 's/./& /g')
+	                            # add space to the middle_aa sequence
+                                    middle_seq=$(echo "$middle_seq" | sed 's/./& /g')
 
-                                # Convert one-letter code to three-letter code
-                                # first aminoacid
-                                first_aa="${first_aa}_Nt"
+                                    # Convert one-letter code to three-letter code:
+                                    # first aminoacid:
+                                    first_aa="${first_aa}_Nt"
 
-                                # middle sequence
-                                middle_seq_space=""
-                                for aa in $middle_seq; do
-                                    to_append=${aa_mapping[$aa]}
-                                    middle_seq_space+=" $to_append"
+                                    # middle sequence:
+                                    middle_seq_space=""
+                                    for aa in $middle_seq; do
+                                        to_append=${aa_mapping[$aa]}
+                                        middle_seq_space+=" $to_append"
+                                    done
+
+                                    # last aminoacid:
+                                    last_aa="${last_aa}_Ct"
+
+	                            # create a new variable to sed in the format we want in the code of gabi
+	                            seq_to_sed="1 $first_aa\n"             # load first aa in the variable
+	                                for aa in $middle_seq_space; do    # load middle sequence in the variable
+    	    	                        seq_to_sed+="1 $aa\n"              # append
+                                    done
+                                    seq_to_sed+="1 $last_aa"               # load last aa in the variable
+
+                                    ######################################
+	                            # count:
+                                    letter_count=$(echo "$sequence" | tr -cd [:alpha:]  | wc -m)
+
+	                            # seds on adsorbate.mol:
+	                            # Replace the placeholder with the converted sequence in the file:
+                                    awk -v var="$seq_to_sed" '{gsub("POS4", var)}1' adsorbate.mol > adsorbate_temp.mol
+                                    mv adsorbate_temp.mol adsorbate.mol
+                                    sed -i "s/POS1/$confs/g" adsorbate.mol             # sed
+                                    sed -i "s/POS2/$dist/g" adsorbate.mol              # sed
+	                            sed -i "s/POS3/$letter_count/g" adsorbate.mol      # sed
+
+	                            # sed on param.in:
+	                            sed -i "s/POS1/$csalt/g" param.in       # sed
+                                    sed -i "s/POS2/1/g" param.in            # sed number of adsorbates
+	                            cprot_XXX="${cprot/d/d-}"	            # add minus to protein concnetration label
+	                            sed -i "s/POS3/$cprot_XXX/g" param.in   # sed protein concentration
+                                    sed -i "s/POS4/2/g" param.in            # sed guessx=0,2,3
+                                    sed -i "s/POS6/$dz/g" param.in          # sed dz
+
+	                            # run simulation:
+	                            sleep 2
+	                            mpirun -np $np $path | tee output
+	                            sleep 2
+
+	                            # get results:
+	                            bash get-v-pH.sh
+
+                                    cd ../
+                                    # Increment label:
+                                    label=$((10#$label))
+                                    label=$((label + 1))
+                                    #label=$(printf "%02d" $label)
                                 done
-
-                                # last aminoacid
-                                last_aa="${last_aa}_Ct"
-
-	                        # create a new variable to sed in the format we want in the code of gabi
-	                        seq_to_sed="1 $first_aa\n"         # load first aa in the variable
-	                            for aa in $middle_seq_space; do    # load middle sequence in the variable
-    	    	                    seq_to_sed+="1 $aa\n"          # append
-                                done
-                                seq_to_sed+="1 $last_aa"           # load last aa in the variable
-
-                                ######################################
-	                        # count:
-                                letter_count=$(echo "$sequence" | tr -cd [:alpha:]  | wc -m)
-
-	                        # seds on adsorbate.mol:
-	                        # Replace the placeholder with the converted sequence in the file:
-                                awk -v var="$seq_to_sed" '{gsub("POS4", var)}1' adsorbate.mol > adsorbate_temp.mol
-                                mv adsorbate_temp.mol adsorbate.mol
-                                sed -i "s/POS1/$confs/g" adsorbate.mol             # sed
-                                sed -i "s/POS2/$dist/g" adsorbate.mol              # sed
-	                        sed -i "s/POS3/$letter_count/g" adsorbate.mol      # sed
-
-	                        # sed on param.in:
-	                        sed -i "s/POS1/$csalt/g" param.in       # sed
-                                sed -i "s/POS2/1/g" param.in            # sed number of adsorbates
-	                        cprot_XXX="${cprot/d/d-}"	        # add minus to protein concnetration label
-	                        sed -i "s/POS3/$cprot_XXX/g" param.in   # sed protein concentration
-                                sed -i "s/POS4/2/g" param.in            # sed guessx=0,2,3
-                                sed -i "s/POS6/$dz/g" param.in          # sed dz
-
-	                        # run simulation:
-	                        sleep 2
-	                        mpirun -np $np $path | tee output
-	                        sleep 2
-
-	                        # get results:
-	                        bash get-v-pH.sh
-
-                               cd ../
-                               # Increment label
-                               label=$((10#$label))
-                               label=$((label + 1))
-                               #label=$(printf "%02d" $label)
                             done
                         done
                     done

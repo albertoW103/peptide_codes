@@ -48,7 +48,7 @@ fnormtol 1.0d-6
 **********************************
 Constants ************************
 
-50				# of rotations adsorbate
+POS9				# of rotations adsorbate
 50				# of rotations surface
 
 14.0				pKw
