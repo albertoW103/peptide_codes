@@ -1,38 +1,47 @@
 #!/bin/python3
 
+#########################################################################
+# This script plot:
+# gamma vs pH
+# for multiples pH values 
+# for one peptide
+#########################################################################
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from matplotlib.font_manager import FontProperties
-import sys
 import re
-
-#####################################################################
-# how to run the script:
-'''
-python3 plot_gamma-pH_peps.py {path1} {path2} {path3} {unit}
-{unit} = 'mg'
-'''
-
-#####################################################################
-# import my_funtions.py:
-current_directory = os.getcwd()                         # current directory path:
-previous_directory = os.path.dirname(current_directory) # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') 
+import sys
+sys.path.append(os.path.expanduser('~/Research/github/my_functions/'))
 from my_functions import *
+from my_functions_style import *
 
 #####################################################################
 # inputs:
-path1 = sys.argv[1] # Puddu2012_seq2-AFILPTG_cprot-1d6_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat
-path2 = sys.argv[2] # Puddu2012_seq2-AFILPTG_cprot-1d6_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat
-path3 = sys.argv[3] # Puddu2012_seq2-AFILPTG_cprot-1d6_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat
-paths = [path1, path2, path3]
+path1='Puddu2012_seq1-KLPGWSG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+path2='Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+path3='Puddu2012_seq3-LDHSLHS_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+units = 'mg'
 
-units = sys,.argv[4]
+
+
+
+
+
+
+
+
+
+
+
+
 
 #####################################################################
+paths = [path1, path2, path3]
+
 # conditions:
 seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
 cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
@@ -43,7 +52,6 @@ rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
 symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
 dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
-#####################################################################
 # plot:
 fig, ax=plt.subplots()
 
@@ -69,19 +77,17 @@ for path in paths:
     # get plot:
     ax.plot(df['pH'], df['gamma'], label= f'{seq}')
 
-#####################################################################
 # format:
 # choose units:
 if unit == 'mg':
-    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12, font=font_for_text)
 else:
-    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12, font=font_for_text)
 
 ax.set_box_aspect(1)
 ax.set_xlabel("pH", fontsize=12)
 add_text(ax, f'[NaCl] = {csalt} M\n[cprot] = {cprot} M', location='custom', offset=(0.7, 0.75), fontsize=10)
 ax.set_box_aspect(1)
-ax.set_xlabel("pH", fontsize=12)
 ax.set_xlim(1.0, 12.0)
 ax.legend(prop={'size':8, 'family': 'monospace'},
           loc='upper left',

@@ -1,5 +1,12 @@
 #!/bin/python3
 
+#########################################################################
+# This script plot:
+# gamma vs protein concentration
+# for one pH value 
+# for multiple peptides
+#########################################################################
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob as glob
@@ -8,36 +15,35 @@ import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from matplotlib.font_manager import FontProperties
 import re
-import sys
-
-# how to run the script:
-'''
-
-python3 plot_gamma-cprot_peps.py {path1} {path2} {path3} {pH} {unit}
-
-{path} = 'Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.01_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
-{pH} = '4 5 7'
-{unit} = 'mg'
-'''
-
-#####################################################################
-# import my_funtions.py:
-current_directory = os.getcwd()                          # current directory path:
-previous_directory = os.path.dirname(current_directory)  # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') # import my functions
+sys.path.append(os.path.expanduser('~/Research/github/my_functions/'))
 from my_functions import *
+from my_functions_style import *
 
 #####################################################################
 # inputs:
-paths1 = sorted(glob.glob(sys.argv[1]))
-paths2 = sorted(glob.glob(sys.argv[2]))
-paths3 = sorted(glob.glob(sys.argv[3]))
-paths_peps = [paths1, paths2, paths3]
+path1='Puddu2012_seq1-KLPGWSG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+path2='Puddu2012_seq2-AFILPTG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+path3='Puddu2012_seq3-LDHSLHS_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+pH = 7.0
+unit = 'mg'
 
-pH = float(sys.argv[4])
-unit = sys.argv[5]
+
+
+
+
+
+
+
+
+
+
 
 #####################################################################
+paths1 = sorted(glob.glob(paths1)
+paths2 = sorted(glob.glob(paths2)
+paths3 = sorted(glob.glob(paths3)
+paths_peps = [paths1, paths2, paths3]
+
 # conditions:
 seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
 cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
@@ -48,8 +54,8 @@ rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
 symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
 dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
-#####################################################################
 # plots:
+plt.style.use("~/Research/github/my_styles/temp_origin0.mpstyle")
 fig, ax=plt.subplots()
 
 # loop for each file:
@@ -107,25 +113,29 @@ for paths in paths_peps:
     # get plot:
     ax.plot(cprot_list, gamma_list, marker='o', label= f'{seq}')
 
-#####################################################################
 # format:
 # choose units:
 if unit == 'mg':
-    ax.set_xlabel("cprot (mg/ml)", fontsize=12)
-    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
+    ax.set_xlabel("cprot (mg/ml)", fontsize=12, font=font_for_text)
+    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12, font=font_for_text)
 else:
     ax.set_xlabel("cprot (M)", fontsize=12)
-    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12, font=font_for_text)
  
 ax.set_box_aspect(1)
-add_text(ax, f'pH = {pH}\n[NaCl] = {csalt} M', location='custom', offset=(0.1, 0.2), fontsize=12)
+add_text(ax, f'pH = {pH}\n[NaCl] = {csalt} M', location='custom', offset=(0.1, 0.2), fontsize=12, fontprop=font_for_text)
 ax.legend(prop={'size':12, 'family': 'monospace'},
           loc='center',
           fontsize=12,
           frameon=False)
 
 #plt.xlim(0, 1)
+# select scale:
 ax.set_xscale('log')
+
+# set font for number:
+set_font_for_numbers(ax,font_for_numbers)
+
 plt.show()
 
 save_file(fig, f'fig_gamma-cprot_peps.png') 

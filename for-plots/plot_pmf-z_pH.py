@@ -7,9 +7,12 @@ import os
 import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from matplotlib.font_manager import FontProperties
-import sys
 import re
 from natsort import natsorted
+import sys
+sys.path.append(os.path.expanduser('~/Research/github/my_functions/'))
+from my_functions import *
+from my_functions_style import *
 
 #####################################################################
 # how to run the script:
@@ -19,12 +22,6 @@ python3 plot_pmf-z_pH.py {path1} {pH}
 
 '''
 
-#####################################################################
-# import my_funtions.py:
-current_directory = os.getcwd()                         # current directory path:
-previous_directory = os.path.dirname(current_directory) # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') 
-from my_functions import *
 
 #####################################################################
 # inputs:

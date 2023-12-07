@@ -1,5 +1,10 @@
 #!/bin/python3
 
+#########################################################################
+# This script plot gamma vs configuration at a single or more pHs values
+# Add * to select a list of files at different configurations
+#########################################################################
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob as glob
@@ -10,27 +15,27 @@ from matplotlib.font_manager import FontProperties
 import sys
 import re
 from natsort import natsorted
-
-#####################################################################
-# how to run the script:
-'''
-
-python3 plot_gamma-cprot.py {path} {pH} {unit}
-{unit} = 'mg'
-'''
-
-#####################################################################
-# import my_funtions.py:
-current_directory = os.getcwd()                         # current directory path:
-previous_directory = os.path.dirname(current_directory) # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') 
+sys.path.append(os.path.expanduser('~/Research/github/my_functions/'))
 from my_functions import *
+from my_functions_style import *
 
 #####################################################################
 # inputs:
-paths = natsorted(glob.glob(sys.argv[1]))
-pHs = list(sys.argv[2].split(' '))
-unit = sys.argv[3]
+paths='familypep-1_seq1-DSARGFKKPGK_cprot-1d6_csalt-0.1_confs-*_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+paths = natsorted(glob.glob(paths)
+
+pHs = [7.0, 7.5]           # select pH values
+unit = 'mg'                # select the unit in mg
+
+
+
+
+
+
+
+
+
+
 
 #####################################################################
 # conditions:
@@ -43,8 +48,8 @@ rsize = paths[0].split('rsize-')[1].split('_')[0]       # read rsize
 symetry = path[0].split('symetry-')[1].split('_')[0]    # read symetry
 dz = paths[0].split('dz-')[1].split('_')[0]             # read dz
 
-#####################################################################
 # plot:
+plt.style.use("~/Research/github/my_styles/temp_origin0.mpstyle")
 fig, ax=plt.subplots()
 
 # loop for each pH value:
@@ -88,23 +93,26 @@ for pH in pHs:
     # get plot:
     ax.plot(confs_list, gamma_list, marker='o', label=f'pH = {pH}', colors=my_colors[0])
 
-#####################################################################
 # format:
 # choose units:
 if unit == 'mg':
-    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (mg m$^{-2})$", fontsize=12, font=font_for_text)
 else:
-    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12)
+    ax.set_ylabel("$\Gamma$ (molecules nm$^{-2})$", fontsize=12, font=font_for_text)
     
 ax.set_box_aspect(1)
-ax.set_xlabel("confs (n)", fontsize=12)
-add_text(ax, f'{seq}\n[NaCl] = {csalt} M', location='custom', offset=(0.025, 0.1), fontsize=12)
+ax.set_xlabel("confs (n)", fontsize=12, font=font_for_text)
+add_text(ax, f'{seq}\n[NaCl] = {csalt} M', location='custom', offset=(0.025, 0.1), fontsize=12, fontprop=font_for_text)
 ax.legend(prop={'size':12, 'family': 'monospace'},
           loc='best',
           fontsize=12,
           frameon=False)
 
+# select scale:
 ax.set_xscale('log')
+
+# set font for number:
+set_font_for_numbers(ax,font_for_numbers)
 
 plt.show()
 

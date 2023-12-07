@@ -1,5 +1,11 @@
 #!/bin/python3
 
+#########################################################################
+# This script plot:
+# PMF_min vs protein configuration
+# for one peptide
+#########################################################################
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob as glob
@@ -7,30 +13,28 @@ import os
 import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from matplotlib.font_manager import FontProperties
-import sys
 import re
 from natsort import natsorted
-
-#####################################################################
-# how to run the script:
-'''
-
-python3 plot_pmfmin-confs_pH.py {path1}
-
-'''
-
-#####################################################################
-# import my_funtions.py:
-current_directory = os.getcwd()                         # current directory path:
-previous_directory = os.path.dirname(current_directory) # previous directory path:
-sys.path.append(f'{previous_directory}/my_functions.py') 
+import sys
+sys.path.append(os.path.expanduser('~/Research/github/my_functions/'))
 from my_functions import *
+from my_functions_style import *
 
 #####################################################################
 # inputs:
-paths = natsorted(glob.glob(sys.argv[1]))
+paths = 'Puddu2012_seq1-KLPGWSG_cprot-*_csalt-0.1_confs-1000_rsize-1_dz-0.50/gamma_peptide-pH.dat'
+
+
+
+
+
+
+
+
 
 #####################################################################
+paths = natsorted(glob.glob(paths))
+
 # conditions:
 seq = re.search(r'_seq\d+-(\w+)_', paths[0]).group(1)   # read peptide sequence
 cprot = path[0].split('cprot-')[1].split('_')[0]        # read cprot
@@ -71,8 +75,8 @@ ax.plot(confs_list, pmfmin_list, marker='o', label=seq)
 #####################################################################
 # format:
 ax.set_box_aspect(1)
-ax.set_xlabel("confs (n)", fontsize=12)
-ax.set_ylabel("$PMF_{min}$ ($k_{B}T)$", fontsize=12)
+ax.set_xlabel("confs (n)", fontsize=12, font=font_for_text)
+ax.set_ylabel("$PMF_{min}$ ($k_{B}T)$", fontsize=12, font=font_for_text)
 add_text(ax, f'[NaCl] = {csalt} M', location='custom', offset=(0.025, 0.1), fontsize=12)
 ax.legend(prop={'size':12, 'family': 'monospace'},
           loc='best',
